@@ -1,8 +1,8 @@
-#Hover
+# Hover
 
 Install the CLI
 ```bash
-git clone git@github.com:pallavkothari/hover-api.git hover && cd hover
+git clone git@github.com:pallavkothari/hover.git hover && cd hover
 mvn install 
 export PATH=$PWD/target/bin:$PATH
 ```
