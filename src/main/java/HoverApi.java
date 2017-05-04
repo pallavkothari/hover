@@ -31,7 +31,7 @@ public class HoverApi {
         this.username = username;
         this.password = password;
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
         client = new OkHttpClient.Builder()
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .addInterceptor(logging)
@@ -90,7 +90,7 @@ public class HoverApi {
     }
 
     @SneakyThrows
-    public void addDnsEntry(String domain, DnsEntry dns) {
+    public String addDnsEntry(String domain, DnsEntry dns) {
         Domain myDomain = getDomain(domain);
 
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
@@ -105,7 +105,7 @@ public class HoverApi {
         Response response = client.newCall(request).execute();
         try (ResponseBody body = response.body()) {
             Preconditions.checkState(response.isSuccessful());
-            log.info("body.string() = " + body.string());
+            return body.string();
         }
     }
 
@@ -120,7 +120,7 @@ public class HoverApi {
     }
 
     @SneakyThrows
-    public void deleteDnsEntry(DnsEntry dns) {
+    public String deleteDnsEntry(DnsEntry dns) {
         Request request = new Request.Builder()
                 .url(String.format("https://www.hover.com/api/dns/%s", dns.getId()))
                 .delete()
@@ -129,6 +129,7 @@ public class HoverApi {
         Response response = client.newCall(request).execute();
         try (ResponseBody body = response.body()) {
             Preconditions.checkState(response.isSuccessful());
+            return body.string();
         }
     }
 

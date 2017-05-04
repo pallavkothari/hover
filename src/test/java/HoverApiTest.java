@@ -1,10 +1,12 @@
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  *
  * Created by pallav.kothari on 5/3/17.
  */
+@Ignore
 public class HoverApiTest {
 
     public static final String USERNAME = "your_username";
