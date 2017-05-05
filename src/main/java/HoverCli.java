@@ -55,12 +55,12 @@ public class HoverCli {
             switch (command) {
                 case ListDomainsCommand.LS_DOMAINS:
                     HoverApi.Domains domains = api.getDomains();
-                    System.out.println(GSON.toJson(domains));
+                    System.out.println(GSON.toJson(domains.getDomains()));
                     break;
                 case ListCnamesCommand.LS_CNAMES:
                     String domain = listCnamesCommand.getDomain();
                     HoverApi.Domains domainsWithDns = api.getDomainsWithDns(domain);
-                    System.out.println(GSON.toJson(domainsWithDns));
+                    System.out.println(GSON.toJson(domainsWithDns.getDomains().get(0).getEntries()));
                     break;
                 case AddCnameCommand.ADD_CNAME:
                     HoverApi.DnsEntry dns = new HoverApi.DnsEntry();    // type is always CNAME
