@@ -66,8 +66,13 @@ public class HoverCli {
                     HoverApi.DnsEntry dns = new HoverApi.DnsEntry();    // type is always CNAME
                     dns.setName(addCnameCommand.getName());
                     dns.setContent(addCnameCommand.getContent());
-                    String resp = api.addDnsEntry(addCnameCommand.getDomain(), dns);
-                    System.out.println(resp);
+                    try {
+                        String resp = api.addDnsEntry(addCnameCommand.getDomain(), dns);
+                        System.out.println(resp);
+                    } catch (IllegalStateException ise) {
+                        System.out.println(GSON.toJson(ise));
+                        System.exit(1);
+                    }
                     break;
                 case DeleteCnameCommand.DELETE_CNAME:
                     HoverApi.DnsEntry toDelete = new HoverApi.DnsEntry();

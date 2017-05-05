@@ -65,24 +65,23 @@ public class HoverApi {
                 .get()
                 .build();
 
-        return getDomains(request);
+        return toDomains(request);
     }
 
     @SneakyThrows
     public Domains getDomainsWithDns(String domain) {
-        Domain myDomain = getDomain(domain);
+        Domain myDomain = filter(getDomains(), domain);
 
         Request request = new Request.Builder()
             .url(String.format("https://www.hover.com/api/domains/%s/dns", myDomain.getId()))
             .get()
             .build();
 
-        return getDomains(request);
+        return toDomains(request);
     }
 
-    private Domain getDomain(String domain) {
-        Domains domains = getDomains();
-        List<Domain> myDomains = domains.getDomains().stream().filter(d -> d.getDomainName().equals(domain)).collect(Collectors.toList());
+    private Domain filter(Domains domains, String toMatch) {
+        List<Domain> myDomains = domains.getDomains().stream().filter(d -> d.getDomainName().equals(toMatch)).collect(Collectors.toList());
         Preconditions.checkArgument(myDomains.size() == 1);
         Domain myDomain = Preconditions.checkNotNull(Iterables.getFirst(myDomains, null));
         log.info("myDomain = " + myDomain);
@@ -91,8 +90,8 @@ public class HoverApi {
 
     @SneakyThrows
     public String addDnsEntry(String domain, DnsEntry dns) {
-        Domain myDomain = getDomain(domain);
-
+        Domain myDomain = filter(getDomainsWithDns(domain), domain);
+        Preconditions.checkState(!exists(dns, myDomain), dns + " already exists in " + myDomain);
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         String content = String.format("name=%s&type=CNAME&content=%s", dns.getName(), dns.getContent());
         RequestBody requestBody = RequestBody.create(mediaType, content);
@@ -109,7 +108,17 @@ public class HoverApi {
         }
     }
 
-    private Domains getDomains(Request request) throws IOException {
+    boolean exists(DnsEntry dns, HoverApi.Domain domainWithDns) {
+        for (HoverApi.DnsEntry dnsEntry : domainWithDns.getEntries()) {
+            String subdomain = dnsEntry.getName();
+            if (dns.getName().equals(subdomain)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Domains toDomains(Request request) throws IOException {
         Response response = client.newCall(request).execute();
         try (ResponseBody body = response.body()) {
             Preconditions.checkState(response.isSuccessful());
