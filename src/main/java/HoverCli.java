@@ -70,7 +70,7 @@ public class HoverCli {
                         String resp = api.addDnsEntry(addCnameCommand.getDomain(), dns);
                         System.out.println(resp);
                     } catch (IllegalStateException ise) {
-                        System.out.println(GSON.toJson(ise));
+                        System.err.println(GSON.toJson(ise));
                         System.exit(1);
                     }
                     break;
@@ -80,7 +80,7 @@ public class HoverCli {
                     System.out.println(api.deleteDnsEntry(toDelete));
                     break;
                 default:
-                    System.out.println("**** unrecognized command " + command);
+                    System.err.println("**** unrecognized command " + command);
                     throw new Error();
             }
 
