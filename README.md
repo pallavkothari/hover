@@ -2,7 +2,7 @@
 
 Install the CLI
 ```bash
-git clone git@github.com:pallavkothari/hover.git hover && cd hover && mvn install && export PATH=$PWD/target/bin:$PATH
+git clone git@github.com:pallavkothari/hover.git hover && cd hover && mvn install && ln -sF $PWD/target/bin/hover /usr/local/bin/hover
 ```
 
 ## Usage
