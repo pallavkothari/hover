@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -69,8 +70,8 @@ public class HoverApi {
     }
 
     @SneakyThrows
-    public Domains getDomainsWithDns(String domain) {
-        Domain myDomain = filter(getDomains(), domain);
+    public Domains getDomainsWithDns(String domainName) {
+        Domain myDomain = filter(getDomains(), domainName);
 
         Request request = new Request.Builder()
             .url(String.format("https://www.hover.com/api/domains/%s/dns", myDomain.getId()))
@@ -80,9 +81,15 @@ public class HoverApi {
         return toDomains(request);
     }
 
+    @SneakyThrows
+    public DnsEntry getDnsEntry(String domainName, String subDomainName) {
+        Domain domain = filter(getDomainsWithDns(domainName), domainName);
+        return domain.getEntries().stream().filter(d->d.getName().equals(subDomainName)).findFirst().get();
+    }
+
     private Domain filter(Domains domains, String toMatch) {
         List<Domain> myDomains = domains.getDomains().stream().filter(d -> d.getDomainName().equals(toMatch)).collect(Collectors.toList());
-        Preconditions.checkArgument(myDomains.size() == 1);
+        Preconditions.checkArgument(myDomains.size() == 1, "Should have only one domain but got: "  + myDomains);
         Domain myDomain = Preconditions.checkNotNull(Iterables.getFirst(myDomains, null));
         log.info("myDomain = " + myDomain);
         return myDomain;
@@ -93,7 +100,7 @@ public class HoverApi {
         Domain myDomain = filter(getDomainsWithDns(domain), domain);
         Preconditions.checkState(!exists(dns, myDomain), dns + " already exists in " + myDomain);
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        String content = String.format("name=%s&type=CNAME&content=%s", dns.getName(), dns.getContent());
+        String content = String.format("name=%s&type=CNAME&content=%s", dns.getName(), dns.getDnsTarget());
         RequestBody requestBody = RequestBody.create(mediaType, content);
         Request request = new Request.Builder()
                 .url(String.format("https://www.hover.com/api/domains/%s/dns", myDomain.getId()))
@@ -109,13 +116,17 @@ public class HoverApi {
     }
 
     boolean exists(DnsEntry dns, HoverApi.Domain domainWithDns) {
+        return get(dns.getName(), domainWithDns).isPresent();
+    }
+
+    Optional<DnsEntry> get(String subDomainName, HoverApi.Domain domainWithDns) {
         for (HoverApi.DnsEntry dnsEntry : domainWithDns.getEntries()) {
             String subdomain = dnsEntry.getName();
-            if (dns.getName().equals(subdomain)) {
-                return true;
+            if (subDomainName.equals(subdomain)) {
+                return Optional.of(dnsEntry);
             }
         }
-        return false;
+        return Optional.empty();
     }
 
     private Domains toDomains(Request request) throws IOException {
@@ -129,9 +140,9 @@ public class HoverApi {
     }
 
     @SneakyThrows
-    public String deleteDnsEntry(DnsEntry dns) {
+    public String deleteDnsEntry(String dnsId) {
         Request request = new Request.Builder()
-                .url(String.format("https://www.hover.com/api/dns/%s", dns.getId()))
+                .url(String.format("https://www.hover.com/api/dns/%s", dnsId))
                 .delete()
                 .build();
 
@@ -140,6 +151,15 @@ public class HoverApi {
             Preconditions.checkState(response.isSuccessful());
             return body.string();
         }
+    }
+
+    @SneakyThrows
+    public String updateDnsTarget(String domain, DnsEntry upsertDns) {
+        Domain myDomain = filter(getDomainsWithDns(domain), domain);
+        Optional<DnsEntry> currentDnsEntry = get(upsertDns.getName(), myDomain);
+        Preconditions.checkState(currentDnsEntry.isPresent(), upsertDns + " should exist in " + myDomain);
+        deleteDnsEntry(currentDnsEntry.get().getId());
+        return addDnsEntry(domain, upsertDns);
     }
 
     @Data
@@ -161,6 +181,7 @@ public class HoverApi {
 
     @Data
     public static final class DnsEntry {
-        private String id, name, type, content;
+        private String id, name, type;
+        @SerializedName("content") private String dnsTarget;
     }
 }

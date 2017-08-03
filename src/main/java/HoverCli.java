@@ -33,6 +33,7 @@ public class HoverCli {
         ListCnamesCommand listCnamesCommand = new ListCnamesCommand();
         AddCnameCommand addCnameCommand = new AddCnameCommand();
         DeleteCnameCommand deleteCnameCommand = new DeleteCnameCommand();
+        UpdateCnameCommand updateCnameCommand = new UpdateCnameCommand();
 
         JCommander jc = new JCommander.Builder()
                 .addObject(cli)
@@ -40,6 +41,7 @@ public class HoverCli {
                 .addCommand(ListCnamesCommand.LS_CNAMES, listCnamesCommand)
                 .addCommand(AddCnameCommand.ADD_CNAME, addCnameCommand)
                 .addCommand(DeleteCnameCommand.DELETE_CNAME, deleteCnameCommand)
+                .addCommand(UpdateCnameCommand.UPDATE_CNAME, updateCnameCommand)
                 .build();
         try {
             jc.parse(args);
@@ -65,19 +67,28 @@ public class HoverCli {
                 case AddCnameCommand.ADD_CNAME:
                     HoverApi.DnsEntry dns = new HoverApi.DnsEntry();    // type is always CNAME
                     dns.setName(addCnameCommand.getName());
-                    dns.setContent(addCnameCommand.getContent());
+                    dns.setDnsTarget(addCnameCommand.getDnsTarget());
                     try {
                         String resp = api.addDnsEntry(addCnameCommand.getDomain(), dns);
                         System.out.println(resp);
                     } catch (IllegalStateException ise) {
-                        System.err.println(GSON.toJson(ise));
+                        System.err.println(ise.getMessage());
                         System.exit(1);
                     }
                     break;
                 case DeleteCnameCommand.DELETE_CNAME:
-                    HoverApi.DnsEntry toDelete = new HoverApi.DnsEntry();
-                    toDelete.setId(deleteCnameCommand.getId());
-                    System.out.println(api.deleteDnsEntry(toDelete));
+                    System.out.println(api.deleteDnsEntry(deleteCnameCommand.getId()));
+                    break;
+                case UpdateCnameCommand.UPDATE_CNAME:
+                    dns = new HoverApi.DnsEntry();
+                    dns.setName(updateCnameCommand.getName());
+                    dns.setDnsTarget(updateCnameCommand.getDnsTarget());
+                    try {
+                        System.out.println(api.updateDnsTarget(updateCnameCommand.getDomain(), dns));
+                    } catch (IllegalStateException ise) {
+                        System.err.println(ise.getMessage());
+                        System.exit(1);
+                    }
                     break;
                 default:
                     System.err.println("**** unrecognized command " + command);
@@ -114,7 +125,7 @@ public class HoverCli {
         private String name;
 
         @Parameter(names = {"--target", "-t"}, description = "the DNS target for this cname record", required = true)
-        private String content;
+        private String dnsTarget;
     }
 
     @Parameters(commandDescription = "delete cname record") @Data
@@ -122,6 +133,19 @@ public class HoverCli {
         public static final String DELETE_CNAME = "rm:cname";
         @Parameter(names = {"--dns-id", "-id"}, description = "the dns id of the record you want to delete", required = true)
         private String id;
+    }
+
+    @Parameters(commandDescription = "Update cname record") @Data
+    private static final class UpdateCnameCommand {
+        public static final String UPDATE_CNAME = "update:cname";
+        @Parameter(names = {"--domain", "-d"}, description = "the domain for which you want to add this cname", required = true)
+        private String domain;
+
+        @Parameter(names = {"--subdomain", "-s"}, description = "the subdomain you're adding a cname record for", required = true)
+        private String name;
+
+        @Parameter(names = {"--target", "-t"}, description = "the DNS target to update the cname record to", required = true)
+        private String dnsTarget;
     }
 
 }

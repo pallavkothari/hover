@@ -1,8 +1,8 @@
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -10,7 +10,6 @@ import static org.junit.Assert.fail;
  *
  * Created by pallav.kothari on 5/3/17.
  */
-@Ignore
 public class HoverApiTest {
 
     public static final String USERNAME = System.getenv("HOVER_USERNAME");
@@ -29,19 +28,19 @@ public class HoverApiTest {
         for (HoverApi.Domain domain : api.getDomainsWithDns(ZEROLIGHTNING_COM).getDomains()) {
             for (HoverApi.DnsEntry dnsEntry : domain.getEntries()) {
                 if (dnsEntry.getName().equals(TEST_CNAME)) {
-                    api.deleteDnsEntry(dnsEntry);
+                    api.deleteDnsEntry(dnsEntry.getId());
                 }
             }
         }
     }
 
     @Test
-    public void test() {
+    public void testAdd() {
         api.getDomains();
         api.getDomainsWithDns(ZEROLIGHTNING_COM);
         HoverApi.DnsEntry dns = new HoverApi.DnsEntry();
         dns.setName(TEST_CNAME);
-        dns.setContent("foo.herokuspace.com");
+        dns.setDnsTarget("foo.herokuspace.com");
         api.addDnsEntry(ZEROLIGHTNING_COM, dns);
 
         try {
@@ -49,7 +48,25 @@ public class HoverApiTest {
             fail();
         } catch (Exception e) {
         }
+    }
 
+    @Test
+    public void testUpdate() {
+        String oldTarget = "foo.herokuspace.com";
+        String newTarget = "bar.herokuspace.com";
+        HoverApi.DnsEntry dns = new HoverApi.DnsEntry();
+        dns.setName(TEST_CNAME);
+        dns.setDnsTarget(oldTarget);
+        api.addDnsEntry(ZEROLIGHTNING_COM, dns);
+
+        HoverApi.DnsEntry dnsEntry = api.getDnsEntry(ZEROLIGHTNING_COM, TEST_CNAME);
+        assertEquals(oldTarget, dnsEntry.getDnsTarget());
+
+        dns.setDnsTarget("bar.herokuspace.com");
+        api.updateDnsTarget(ZEROLIGHTNING_COM, dns);
+
+        dnsEntry = api.getDnsEntry(ZEROLIGHTNING_COM, TEST_CNAME);
+        assertEquals(newTarget, dnsEntry.getDnsTarget());
     }
 
     @Test
