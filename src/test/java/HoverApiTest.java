@@ -1,3 +1,4 @@
+import com.google.common.base.Preconditions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,8 @@ public class HoverApiTest {
 
     @Before
     public void before() {
+        Preconditions.checkNotNull(USERNAME, "Set HOVER_USERNAME and HOVER_PASSWORD credentials as env vars for hover");
+        Preconditions.checkNotNull(PASSWORD, "Set HOVER_USERNAME and HOVER_PASSWORD credentials as env vars for hover");
         api.login();
     }
 
