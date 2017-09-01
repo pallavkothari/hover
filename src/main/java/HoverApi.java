@@ -153,6 +153,11 @@ public class HoverApi {
         }
     }
 
+    public Optional<DnsEntry> getCurrentDnsEntry(String domain, String cname) {
+        Domain myDomain = filter(getDomainsWithDns(domain), domain);
+        return get(cname, myDomain);
+    }
+
     @SneakyThrows
     public String updateDnsTarget(String domain, DnsEntry upsertDns) {
         Domain myDomain = filter(getDomainsWithDns(domain), domain);

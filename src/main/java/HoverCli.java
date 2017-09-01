@@ -7,6 +7,8 @@ import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 /**
  * Expose a CLI to work with hover
  * Created by pallav.kothari on 5/4/17.
@@ -31,6 +33,7 @@ public class HoverCli {
 
         ListDomainsCommand listDomainsCommand = new ListDomainsCommand();
         ListCnamesCommand listCnamesCommand = new ListCnamesCommand();
+        ListCnameCommand listCnameCommand = new ListCnameCommand();
         AddCnameCommand addCnameCommand = new AddCnameCommand();
         DeleteCnameCommand deleteCnameCommand = new DeleteCnameCommand();
         UpdateCnameCommand updateCnameCommand = new UpdateCnameCommand();
@@ -39,6 +42,7 @@ public class HoverCli {
                 .addObject(cli)
                 .addCommand(ListDomainsCommand.LS_DOMAINS, listDomainsCommand)
                 .addCommand(ListCnamesCommand.LS_CNAMES, listCnamesCommand)
+                .addCommand(ListCnameCommand.LS_CNAME, listCnameCommand)
                 .addCommand(AddCnameCommand.ADD_CNAME, addCnameCommand)
                 .addCommand(DeleteCnameCommand.DELETE_CNAME, deleteCnameCommand)
                 .addCommand(UpdateCnameCommand.UPDATE_CNAME, updateCnameCommand)
@@ -63,6 +67,10 @@ public class HoverCli {
                     String domain = listCnamesCommand.getDomain();
                     HoverApi.Domains domainsWithDns = api.getDomainsWithDns(domain);
                     System.out.println(GSON.toJson(domainsWithDns.getDomains().get(0).getEntries()));
+                    break;
+                case ListCnameCommand.LS_CNAME:
+                    Optional<HoverApi.DnsEntry> currentDnsEntry = api.getCurrentDnsEntry(listCnameCommand.getDomain(), listCnameCommand.getCname());
+                    System.out.println(GSON.toJson(currentDnsEntry.isPresent() ? currentDnsEntry.get() : null));
                     break;
                 case AddCnameCommand.ADD_CNAME:
                     HoverApi.DnsEntry dns = new HoverApi.DnsEntry();    // type is always CNAME
@@ -112,6 +120,18 @@ public class HoverCli {
 
         @Parameter(names = {"--domain", "-d"}, description = "the domain for which you want cnames", required = true)
         private String domain;
+    }
+
+
+    @Parameters(commandDescription = "list cname") @Data
+    private static class ListCnameCommand {
+        public static final String LS_CNAME = "ls:cname";
+
+        @Parameter(names = {"--domain", "-d"}, description = "the domain for which you want cnames", required = true)
+        private String domain;
+
+        @Parameter(names = {"--cname", "-c"}, description = "the exact cname to search for", required = true)
+        private String cname;
     }
 
     @Parameters(commandDescription = "add cname record") @Data

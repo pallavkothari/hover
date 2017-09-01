@@ -3,6 +3,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -83,4 +85,10 @@ public class HoverApiTest {
         assertTrue(api.exists(dns, domain));
     }
 
+    @Test
+    public void getCurrent() {
+        Optional<HoverApi.DnsEntry> currentDnsEntry = api.getCurrentDnsEntry(ZEROLIGHTNING_COM, "*.zero-demo-shared.sites");
+        assertTrue(currentDnsEntry.isPresent());
+        System.out.println("currentDnsEntry = " + currentDnsEntry.get());
+    }
 }
