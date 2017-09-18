@@ -1,6 +1,7 @@
 import com.google.common.base.Preconditions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -13,6 +14,7 @@ import static org.junit.Assert.fail;
  *
  * Created by pallav.kothari on 5/3/17.
  */
+@Ignore
 public class HoverApiTest {
 
     public static final String USERNAME = System.getenv("HOVER_USERNAME");
