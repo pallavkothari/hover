@@ -1,11 +1,13 @@
 # Hover
 
-Install the CLI
+A command line tool to talk to and manage your hover.com account 
+
+### Install the CLI
 ```bash
 git clone git@github.com:pallavkothari/hover.git hover && cd hover && mvn install && ln -sF $PWD/target/bin/hover /usr/local/bin/hover
 ```
 
-## Usage
+### Usage
 
 ```bash
 hover --help
