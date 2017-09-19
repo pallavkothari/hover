@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pallavkothari/hover.svg?branch=master)](https://travis-ci.org/pallavkothari/hover)
+
 # Hover
 
 A command line tool to talk to and manage your hover.com account 
