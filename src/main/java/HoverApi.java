@@ -100,7 +100,7 @@ public class HoverApi {
         Domain myDomain = filter(getDomainsWithDns(domain), domain);
         Preconditions.checkState(!exists(dns, myDomain), dns + " already exists in " + myDomain);
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        String content = String.format("name=%s&type=CNAME&content=%s", dns.getName(), dns.getDnsTarget());
+        String content = String.format("name=%s&type=%s&content=%s", dns.getName(), dns.getType(), dns.getDnsTarget());
         RequestBody requestBody = RequestBody.create(mediaType, content);
         Request request = new Request.Builder()
                 .url(String.format("https://www.hover.com/api/domains/%s/dns", myDomain.getId()))
@@ -186,7 +186,8 @@ public class HoverApi {
 
     @Data
     public static final class DnsEntry {
-        private String id, name, type;
+        private String id, name;
+        private String type = "CNAME";
         @SerializedName("content") private String dnsTarget;
     }
 }

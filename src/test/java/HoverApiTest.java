@@ -6,9 +6,9 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -21,6 +21,7 @@ public class HoverApiTest {
     public static final String PASSWORD = System.getenv("HOVER_PASSWORD");
     public static final String ZEROLIGHTNING_COM = "zerolightning.com";
     public static final String TEST_CNAME = "foo";
+    public static final String TEST_TXT_NAME = "TXTFOO";
     private final HoverApi api = new HoverApi(USERNAME, PASSWORD);
 
     @Before
@@ -34,7 +35,7 @@ public class HoverApiTest {
     public void after() {
         for (HoverApi.Domain domain : api.getDomainsWithDns(ZEROLIGHTNING_COM).getDomains()) {
             for (HoverApi.DnsEntry dnsEntry : domain.getEntries()) {
-                if (dnsEntry.getName().equals(TEST_CNAME)) {
+                if (dnsEntry.getName().equals(TEST_CNAME) || dnsEntry.getName().equals(TEST_TXT_NAME)) {
                     api.deleteDnsEntry(dnsEntry.getId());
                 }
             }
@@ -55,6 +56,15 @@ public class HoverApiTest {
             fail();
         } catch (Exception e) {
         }
+    }
+
+    @Test
+    public void testAddTxtRecord() {
+        HoverApi.DnsEntry dns = new HoverApi.DnsEntry();
+        dns.setType("TXT");
+        dns.setName(TEST_TXT_NAME);
+        dns.setDnsTarget("BAR");
+        api.addDnsEntry(ZEROLIGHTNING_COM, dns);
     }
 
     @Test
@@ -92,5 +102,11 @@ public class HoverApiTest {
         Optional<HoverApi.DnsEntry> currentDnsEntry = api.getCurrentDnsEntry(ZEROLIGHTNING_COM, "*.zero-demo-shared.sites");
         assertTrue(currentDnsEntry.isPresent());
         System.out.println("currentDnsEntry = " + currentDnsEntry.get());
+    }
+
+    @Test
+    public void testDnsEntryType() {
+        HoverApi.DnsEntry dnsEntry = new HoverApi.DnsEntry();
+        assertThat(dnsEntry.getType(), is("CNAME"));
     }
 }

@@ -37,6 +37,7 @@ public class HoverCli {
         AddCnameCommand addCnameCommand = new AddCnameCommand();
         DeleteCnameCommand deleteCnameCommand = new DeleteCnameCommand();
         UpdateCnameCommand updateCnameCommand = new UpdateCnameCommand();
+        AddTxtCommand addTxtCommand = new AddTxtCommand();
 
         JCommander jc = new JCommander.Builder()
                 .addObject(cli)
@@ -46,6 +47,7 @@ public class HoverCli {
                 .addCommand(AddCnameCommand.ADD_CNAME, addCnameCommand)
                 .addCommand(DeleteCnameCommand.DELETE_CNAME, deleteCnameCommand)
                 .addCommand(UpdateCnameCommand.UPDATE_CNAME, updateCnameCommand)
+                .addCommand(AddTxtCommand.ADD_TXT, addTxtCommand)
                 .build();
         try {
             jc.parse(args);
@@ -70,19 +72,14 @@ public class HoverCli {
                     break;
                 case ListCnameCommand.LS_CNAME:
                     Optional<HoverApi.DnsEntry> currentDnsEntry = api.getCurrentDnsEntry(listCnameCommand.getDomain(), listCnameCommand.getCname());
-                    System.out.println(GSON.toJson(currentDnsEntry.isPresent() ? currentDnsEntry.get() : null));
+                    System.out.println(GSON.toJson(currentDnsEntry.orElse(null)));
                     break;
                 case AddCnameCommand.ADD_CNAME:
-                    HoverApi.DnsEntry dns = new HoverApi.DnsEntry();    // type is always CNAME
+                    HoverApi.DnsEntry dns = new HoverApi.DnsEntry();
+                    dns.setType("CNAME");
                     dns.setName(addCnameCommand.getName());
                     dns.setDnsTarget(addCnameCommand.getDnsTarget());
-                    try {
-                        String resp = api.addDnsEntry(addCnameCommand.getDomain(), dns);
-                        System.out.println(resp);
-                    } catch (IllegalStateException ise) {
-                        System.err.println(ise.getMessage());
-                        System.exit(1);
-                    }
+                    addDnsEntry(api, dns, addCnameCommand.getDomain());
                     break;
                 case DeleteCnameCommand.DELETE_CNAME:
                     System.out.println(api.deleteDnsEntry(deleteCnameCommand.getId()));
@@ -98,6 +95,13 @@ public class HoverCli {
                         System.exit(1);
                     }
                     break;
+                case AddTxtCommand.ADD_TXT:
+                    dns = new HoverApi.DnsEntry();
+                    dns.setType("TXT");
+                    dns.setName(addTxtCommand.getName());
+                    dns.setDnsTarget(addTxtCommand.getValue());
+                    addDnsEntry(api, dns, addTxtCommand.getDomain());
+                    break;
                 default:
                     System.err.println("**** unrecognized command " + command);
                     throw new Error();
@@ -109,9 +113,19 @@ public class HoverCli {
         }
     }
 
+    private static void addDnsEntry(HoverApi api, HoverApi.DnsEntry dns, String domain) {
+        try {
+            String resp = api.addDnsEntry(domain, dns);
+            System.out.println(resp);
+        } catch (IllegalStateException ise) {
+            System.err.println(ise.getMessage());
+            System.exit(1);
+        }
+    }
+
     @Parameters(commandDescription = "list domains")
     private static class ListDomainsCommand {
-        public static final String LS_DOMAINS = "ls:domains";
+        static final String LS_DOMAINS = "ls:domains";
     }
 
     @Parameters(commandDescription = "list cnames") @Data
@@ -167,5 +181,20 @@ public class HoverCli {
         @Parameter(names = {"--target", "-t"}, description = "the DNS target to update the cname record to", required = true)
         private String dnsTarget;
     }
+
+    @Parameters(commandDescription = "Add TXT record") @Data
+    public static final class AddTxtCommand {
+        public static final String ADD_TXT = "add:txt";
+
+        @Parameter(names = {"--domain", "-d"}, description = "the domain for which you want to add this TXT record", required = true)
+        private String domain;
+
+        @Parameter(names = {"--name", "-n"}, description = "the attribute name", required = true)
+        private String name;
+
+        @Parameter(names = {"--value", "-v"}, description = "the attribute value", required = true)
+        private String value;
+    }
+
 
 }
