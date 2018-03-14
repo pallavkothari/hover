@@ -29,3 +29,9 @@ or with jq:
 hover -u username -p password ls:domains | jq -r '.[].domain_name'
 
 ```
+
+### Releasing
+```bash
+mvn release:prepare
+mvn release:perform
+```
