@@ -17,7 +17,7 @@ repositories {
     }
 }
 dependencies {
-    compile 'link.pallav:hover:0.2'
+    compile 'link.pallav:hover:0.3'
 }
 ```
 
