@@ -9,6 +9,18 @@ A command line tool to talk to and manage your hover.com account
 git clone git@github.com:pallavkothari/hover.git hover && cd hover && mvn install && ln -sF $PWD/target/bin/hover /usr/local/bin/hover
 ```
 
+### Install with gradle
+```bash
+repositories {
+    maven {
+        url  "https://dl.bintray.com/pallavkothari/hover" 
+    }
+}
+dependencies {
+    compile 'link.pallav:hover:0.2'
+}
+```
+
 ### Usage
 
 ```bash
