@@ -16,7 +16,7 @@
     <distributionManagement>
         <repository>
             <id>bintray</id>
-            <url>https://api.bintray.com/maven/pallavkothari/hover/hover</url>
+            <url>https://api.bintray.com/maven/pallavkothari/hover/hover/;publish=1</url>
         </repository>
     </distributionManagement>
 
