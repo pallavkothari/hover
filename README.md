@@ -31,6 +31,7 @@ hover -u username -p password ls:domains | jq -r '.[].domain_name'
 ```
 
 ### Releasing
+Follow [these instructions](http://veithen.github.io/2013/05/26/github-bintray-maven-release-plugin.html)
 ```bash
 mvn release:prepare
 mvn release:perform
