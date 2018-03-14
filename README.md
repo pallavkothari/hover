@@ -23,22 +23,25 @@ dependencies {
 
 ### Usage
 
+Pass credentials by setting the `HOVER_USERNAME` and `HOVER_PASSWORD` environment variables. 
+Alternatively, use the `--username`|`--password` CLI options (discouraged). 
+
 ```bash
 hover --help
 
-hover -u username -p password ls:domains
-hover -u username -p password ls:cnames
-hover -u username -p password ls:cname -d mydomain.com -c cname
-hover -u username -p password add:cname -d mydomain.com -s sub.domain -t target.herokuspace.com 
-hover -u username -p password update:cname -d mydomain.com -s sub.domain -t target2.herokuspace.com 
-hover -u username -p password rm:cname -id dnsId  # get this from ls:cnames
-hover -u username -p password add:txt -d <mydomain.com> -n <name> -v <value>
+hover ls:domains
+hover ls:cnames -d mydomain.com
+hover ls:cname -d mydomain.com -c cname
+hover add:cname -d mydomain.com -s sub.domain -t target.herokuspace.com 
+hover update:cname -d mydomain.com -s sub.domain -t target2.herokuspace.com 
+hover rm:cname -id dnsId  # get this from ls:cnames
+hover add:txt -d <mydomain.com> -n <name> -v <value>
 # removing txt records works fine with the existing rm:cname command:
-hover -u username -p password rm:cname -id $(hover -u username -p password ls:cname -d mydomain.com -c FOO | jq -r '.id')
+hover rm:cname -id $(hover ls:cname -d mydomain.com -c FOO | jq -r '.id')
 
 
 or with jq: 
-hover -u username -p password ls:domains | jq -r '.[].domain_name'
+hover  ls:domains | jq -r '.[].domain_name'
 
 ```
 

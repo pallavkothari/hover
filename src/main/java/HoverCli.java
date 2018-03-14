@@ -19,10 +19,10 @@ public class HoverCli {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    @Parameter(names = {"-u", "--username"}, required = true)
+    @Parameter(names = {"-u", "--username"})
     private String username;
 
-    @Parameter(names = {"-p", "--password"}, required = true, password = true)
+    @Parameter(names = {"-p", "--password"}, password = true)
     private String password;
 
     @Parameter(names = {"--help", "-h"}, help = true)
@@ -56,7 +56,9 @@ public class HoverCli {
                 return;
             }
 
-            HoverApi api = new HoverApi(cli.getUsername(), cli.getPassword()).login();
+            String username = Preconditions.checkNotNull(Optional.ofNullable(System.getenv("HOVER_USERNAME")).orElse(cli.getUsername()), "set HOVER_USERNAME env var or use --username CLI param") ;
+            String password = Preconditions.checkNotNull(Optional.ofNullable(System.getenv("HOVER_PASSWORD")).orElse(cli.getPassword()), "set HOVER_PASSWORD env var or use --password CLI param") ;
+            HoverApi api = new HoverApi(username, password).login();
 
             String command = Preconditions.checkNotNull(jc.getParsedCommand());
 
