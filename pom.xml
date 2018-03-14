@@ -4,13 +4,13 @@
 
     <groupId>link.pallav</groupId>
     <artifactId>hover</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
 
     <scm>
         <connection>scm:git:https://github.com/pallavkothari/hover.git</connection>
         <developerConnection>scm:git:git@github.com:pallavkothari/hover.git</developerConnection>
         <url>https://github.com/pallavkothari/hover</url>
-        <tag>HEAD</tag>
+        <tag>hover-0.4</tag>
     </scm>
 
     <distributionManagement>
