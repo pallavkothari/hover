@@ -2,7 +2,7 @@
 
 # Hover
 
-A command line tool to talk to and manage your hover.com account 
+A command line tool to talk to and manage your hover.com account. Enjoy!
 
 ### Install the CLI
 ```bash
