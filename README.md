@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/pallavkothari/hover.svg?branch=master)](https://travis-ci.org/pallavkothari/hover)
+[![Build Status](https://travis-ci.org/pallavkothari/hover.svg?branch=master)](https://travis-ci.org/pallavkothari/hover)[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&identifier=90238397)](https://dependabot.com)
+
 
 # Hover
 
