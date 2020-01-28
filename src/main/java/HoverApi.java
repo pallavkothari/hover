@@ -44,7 +44,7 @@ public class HoverApi {
         MediaType mediaType = MediaType.parse("application/json; charset=UTF-8");
         RequestBody body = RequestBody.create(mediaType, GSON.toJson(new Payload(username, password)));
         Request request = new Request.Builder()
-                .url("https://www.hover.com/signin/auth.json")
+                .url("https://www.hover.com/api/login")
                 .post(body)
                 .addHeader("content-type", "application/json; charset=UTF-8")
                 .build();
