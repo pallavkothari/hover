@@ -18,8 +18,18 @@ repositories {
     }
 }
 dependencies {
-    compile 'link.pallav:hover:0.4'
+    compile 'link.pallav:hover:0.6'
 }
+```
+
+### Install with maven
+```xml
+<dependency>
+  <groupId>link.pallav</groupId>
+  <artifactId>hover</artifactId>
+  <version>0.6</version>
+  <type>pom</type>
+</dependency>
 ```
 
 ### Usage
