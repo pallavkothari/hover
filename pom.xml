@@ -30,7 +30,7 @@
         <okhttp.version>4.3.1</okhttp.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <jcommander.version>1.78</jcommander.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
 
     <dependencies>
